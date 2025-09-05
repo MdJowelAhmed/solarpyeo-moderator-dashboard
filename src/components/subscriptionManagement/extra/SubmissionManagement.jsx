@@ -15,13 +15,7 @@ import { sampleData } from "./sampleData";
 import { TableColumns } from "./CulomsTable";
 // import { PDFModal } from "../modals";
 import { AcceptModal, EditModal, JuryModal, PDFModal } from "./GeneratePDFContent ";
-// import { AcceptModal, EditModal, JuryModal, PDFModal } from "../modals";
-// import { sampleData } from './data/sampleData';
-// import { tableColumns } from './components/TableColumns';
-// import { PDFModal } from './modals/PDFModal';
-// import { AcceptModal } from './modals/AcceptModal';
-// import { JuryModal } from './modals/JuryModal';
-// import { EditModal } from './modals/EditModal';
+
 
 const { Option } = Select;
 
@@ -80,9 +74,9 @@ const SubmissionManagementCom = () => {
     message.success("Case sent to jury for review!");
   };
 
-  const handleJurySubmit = (juryDecision, juryReason) => {
-    if (!juryDecision || !juryReason.trim()) {
-      message.error("Please provide both decision and reason!");
+  const handleJurySubmit = (juryDecision, juryReason, confidenceLevel, additionalNotes) => {
+    if (!juryDecision || !juryReason.trim() || !confidenceLevel) {
+      message.error("Please provide decision, detailed reasoning, and confidence level!");
       return false;
     }
 
@@ -91,7 +85,10 @@ const SubmissionManagementCom = () => {
         const newFeedback = [...(item.juryFeedback || []), {
           jurorId: (item.juryFeedback?.length || 0) + 1,
           decision: juryDecision,
-          reason: juryReason
+          reason: juryReason,
+          confidenceLevel: confidenceLevel,
+          additionalNotes: additionalNotes || '',
+          timestamp: new Date().toISOString()
         }];
         
         const newVoteCount = newFeedback.length;
@@ -131,18 +128,44 @@ const SubmissionManagementCom = () => {
     return true;
   };
 
-  const handleReject = (record) => {
+  const handleReject = (record, type = 'disproven') => {
+    const titles = {
+      'disproven': 'Mark as Disproven?',
+      'unable': 'Unable to Decide?'
+    };
+    
+    const contents = {
+      'disproven': 'This will mark the submission as disproven and rejected. This action cannot be undone.',
+      'unable': 'This will mark the case as requiring further review due to insufficient evidence or complexity.'
+    };
+    
+    const statuses = {
+      'disproven': 'Rejected',
+      'unable': 'Unable to Decide'
+    };
+    
+    const messages = {
+      'disproven': 'Submission marked as disproven!',
+      'unable': 'Case marked as unable to decide - requires further review!'
+    };
+
     Modal.confirm({
-      title: 'Are you sure?',
-      content: 'Do you want to reject this submission?',
-      okText: 'Yes, Reject',
+      title: titles[type],
+      content: contents[type],
+      okText: type === 'disproven' ? 'Yes, Mark as Disproven' : 'Yes, Unable to Decide',
       cancelText: 'Cancel',
+      okButtonProps: {
+        style: {
+          backgroundColor: type === 'disproven' ? '#f5222d' : '#faad14',
+          borderColor: type === 'disproven' ? '#f5222d' : '#faad14'
+        }
+      },
       onOk() {
         const updatedData = data.map((item) =>
-          item.id === record.id ? { ...item, status: "Rejected" } : item
+          item.id === record.id ? { ...item, status: statuses[type] } : item
         );
         setData(updatedData);
-        message.success("Submission rejected!");
+        message.success(messages[type]);
       }
     });
   };
