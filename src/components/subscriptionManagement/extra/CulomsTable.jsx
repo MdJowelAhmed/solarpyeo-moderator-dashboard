@@ -13,20 +13,20 @@ export const TableColumns = (actionHandlers) => {
     showAcceptModal,
     showJuryModal,
     showEditModal,
-    handleReject
+    handleReject,
   } = actionHandlers;
 
-//   const handleRejectConfirm = (record) => {
-//     Modal.confirm({
-//       title: 'Are you sure?',
-//       content: 'Do you want to reject this submission?',
-//       okText: 'Yes, Reject',
-//       cancelText: 'Cancel',
-//       onOk() {
-//         handleReject(record);
-//       }
-//     });
-//   };
+  //   const handleRejectConfirm = (record) => {
+  //     Modal.confirm({
+  //       title: 'Are you sure?',
+  //       content: 'Do you want to reject this submission?',
+  //       okText: 'Yes, Reject',
+  //       cancelText: 'Cancel',
+  //       onOk() {
+  //         handleReject(record);
+  //       }
+  //     });
+  //   };
 
   return [
     {
@@ -112,7 +112,8 @@ export const TableColumns = (actionHandlers) => {
                 size="middle"
                 className="hover:shadow-lg transition-all duration-200"
                 style={{
-                  background: "linear-gradient(135deg, #52c41a 0%, #389e0d 100%)",
+                  background:
+                    "linear-gradient(135deg, #52c41a 0%, #389e0d 100%)",
                   border: "none",
                   borderRadius: "6px",
                   color: "white",
@@ -125,7 +126,8 @@ export const TableColumns = (actionHandlers) => {
           )}
 
           {/* Jury Decision Button - Enhanced for jury review */}
-          {(record.status === "Sent to Jury" || record.status === "Under Jury Review") && (
+          {(record.status === "Sent to Jury" ||
+            record.status === "Under Jury Review") && (
             <Tooltip title="Submit Jury Verdict">
               <Button
                 // icon={<MdGavel />}
@@ -133,7 +135,8 @@ export const TableColumns = (actionHandlers) => {
                 size="middle"
                 className="hover:shadow-lg transition-all duration-200"
                 style={{
-                  background: "linear-gradient(135deg, #722ed1 0%, #531dab 100%)",
+                  background:
+                    "linear-gradient(135deg, #722ed1 0%, #531dab 100%)",
                   border: "none",
                   borderRadius: "6px",
                   color: "white",
@@ -167,15 +170,15 @@ export const TableColumns = (actionHandlers) => {
           )} */}
 
           {/* Unable to Decide Button - For complex cases */}
-          {![
-"Rejected", "Finalized", "Completed"].includes(record.status) && (
+          {!["Rejected", "Finalized", "Completed"].includes(record.status) && (
             <Tooltip title="Mark as Unable to Decide - Requires Further Review">
               <Button
-                onClick={() => handleReject(record, 'unable')}
+                onClick={() => handleReject(record, "unable")}
                 size="middle"
                 className="hover:shadow-lg transition-all duration-200"
                 style={{
-                  background: "linear-gradient(135deg, #faad14 0%, #d48806 100%)",
+                  background:
+                    "linear-gradient(135deg, #faad14 0%, #d48806 100%)",
                   border: "none",
                   borderRadius: "6px",
                   color: "white",
@@ -188,15 +191,15 @@ export const TableColumns = (actionHandlers) => {
           )}
 
           {/* Disproven Button - For rejected cases */}
-          {![
-"Rejected", "Finalized", "Completed"].includes(record.status) && (
+          {!["Rejected", "Finalized", "Completed"].includes(record.status) && (
             <Tooltip title="Reject & Mark as Disproven">
               <Button
-                onClick={() => handleReject(record, 'disproven')}
+                onClick={() => handleReject(record, "disproven")}
                 size="middle"
                 className="hover:shadow-lg transition-all duration-200"
                 style={{
-                  background: "linear-gradient(135deg, #f5222d 0%, #cf1322 100%)",
+                  background:
+                    "linear-gradient(135deg, #f5222d 0%, #cf1322 100%)",
                   border: "none",
                   borderRadius: "6px",
                   color: "white",
