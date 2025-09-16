@@ -7,15 +7,18 @@ import {
   Tag,
   Tooltip,
   message,
-  Modal
+  Modal,
 } from "antd";
 import { FaFilePdf, FaEdit } from "react-icons/fa";
 import { MdGavel } from "react-icons/md";
 import { sampleData } from "./sampleData";
 import { TableColumns } from "./CulomsTable";
-// import { PDFModal } from "../modals";
-import { AcceptModal, EditModal, JuryModal, PDFModal } from "./GeneratePDFContent ";
-
+import {
+  AcceptModal,
+  EditModal,
+  JuryModal,
+  PDFModal,
+} from "./GeneratePDFContent ";
 
 const { Option } = Select;
 
@@ -74,36 +77,54 @@ const SubmissionManagementCom = () => {
     message.success("Case sent to jury for review!");
   };
 
-  const handleJurySubmit = (juryDecision, juryReason, confidenceLevel, additionalNotes) => {
-    if (!juryDecision || !juryReason.trim() || !confidenceLevel) {
-      message.error("Please provide decision, detailed reasoning, and confidence level!");
+  // Accept Function with Confirmation
+  const directAccept = (record) => {
+    Modal.confirm({
+      title: "Are you sure?",
+      content: "Do you want to accept this submission and send it to jury?",
+      okText: "Yes, Accept",
+      cancelText: "Cancel",
+      onOk() {
+        const updatedData = data.map((item) =>
+          item.id === record.id ? { ...item, status: "Sent to Jury" } : item
+        );
+        setData(updatedData);
+        message.success("Case sent to jury successfully!");
+      },
+    });
+  };
+
+  const handleJurySubmit = (juryDecision, juryReason) => {
+    if (!juryDecision || !juryReason.trim()) {
+      message.error("Please provide both decision and reason!");
       return false;
     }
 
     const updatedData = data.map((item) => {
       if (item.id === selectedRecord.id) {
-        const newFeedback = [...(item.juryFeedback || []), {
-          jurorId: (item.juryFeedback?.length || 0) + 1,
-          decision: juryDecision,
-          reason: juryReason,
-          confidenceLevel: confidenceLevel,
-          additionalNotes: additionalNotes || '',
-          timestamp: new Date().toISOString()
-        }];
-        
+        const newFeedback = [
+          ...(item.juryFeedback || []),
+          {
+            jurorId: (item.juryFeedback?.length || 0) + 1,
+            decision: juryDecision,
+            reason: juryReason,
+          },
+        ];
+
         const newVoteCount = newFeedback.length;
-        const newStatus = newVoteCount === 3 ? "Final Review" : "Under Jury Review";
-        
+        const newStatus =
+          newVoteCount === 3 ? "Final Review" : "Under Jury Review";
+
         return {
           ...item,
           juryFeedback: newFeedback,
           jurorVote: `${newVoteCount} of 3`,
-          status: newStatus
+          status: newStatus,
         };
       }
       return item;
     });
-    
+
     setData(updatedData);
     message.success("Jury decision submitted successfully!");
     return true;
@@ -117,56 +138,30 @@ const SubmissionManagementCom = () => {
           status: "Finalized",
           finalDecisions: decisions,
           adminComments: formValues.adminComments,
-          finalResult: formValues.finalResult
+          finalResult: formValues.finalResult,
         };
       }
       return item;
     });
-    
+
     setData(updatedData);
     message.success("Final decision submitted successfully!");
     return true;
   };
 
-  const handleReject = (record, type = 'disproven') => {
-    const titles = {
-      'disproven': 'Mark as Disproven?',
-      'unable': 'Unable to Decide?'
-    };
-    
-    const contents = {
-      'disproven': 'This will mark the submission as disproven and rejected. This action cannot be undone.',
-      'unable': 'This will mark the case as requiring further review due to insufficient evidence or complexity.'
-    };
-    
-    const statuses = {
-      'disproven': 'Rejected',
-      'unable': 'Unable to Decide'
-    };
-    
-    const messages = {
-      'disproven': 'Submission marked as disproven!',
-      'unable': 'Case marked as unable to decide - requires further review!'
-    };
-
+  const handleReject = (record) => {
     Modal.confirm({
-      title: titles[type],
-      content: contents[type],
-      okText: type === 'disproven' ? 'Yes, Mark as Disproven' : 'Yes, Unable to Decide',
-      cancelText: 'Cancel',
-      okButtonProps: {
-        style: {
-          backgroundColor: type === 'disproven' ? '#f5222d' : '#faad14',
-          borderColor: type === 'disproven' ? '#f5222d' : '#faad14'
-        }
-      },
+      title: "Are you sure?",
+      content: "Do you want to reject this submission?",
+      okText: "Yes, Reject",
+      cancelText: "Cancel",
       onOk() {
         const updatedData = data.map((item) =>
-          item.id === record.id ? { ...item, status: statuses[type] } : item
+          item.id === record.id ? { ...item, status: "Rejected" } : item
         );
         setData(updatedData);
-        message.success(messages[type]);
-      }
+        message.success("Submission rejected!");
+      },
     });
   };
 
@@ -175,7 +170,9 @@ const SubmissionManagementCom = () => {
     showAcceptModal,
     showJuryModal,
     showEditModal,
-    handleReject
+    handleReject,
+    handleReject,
+    directAccept,
   };
 
   const components = {
@@ -238,19 +235,21 @@ const SubmissionManagementCom = () => {
       </div>
 
       {/* Table */}
-      <div className="responsive-table">
-        <Table
-          components={components}
-          columns={columns}
-          dataSource={filteredData}
-          rowKey="id"
-          pagination={{
-            pageSize: 10,
-          }}
-          scroll={{ x: 'max-content' }}
-          className="custom-table"
-        />
-      </div>
+   <div className="flex-1 overflow-auto pt-16 mt-3">
+ 
+  <div className="overflow-x-auto min-w-full p-0">
+    <Table
+      components={components}
+      columns={columns}
+      dataSource={filteredData}
+      rowKey="id"
+      pagination={{ pageSize: 10 }}
+      scroll={{ x: 1300 }}   // scroll value as fixed px
+      className="custom-table"
+    />
+  </div>
+</div>
+
 
       {/* Modals */}
       <PDFModal
