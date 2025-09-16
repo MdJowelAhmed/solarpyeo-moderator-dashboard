@@ -174,7 +174,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
           key: "/terms-and-conditions",
           label: (
             <Link to="/terms-and-conditions">
-              {collapsed ? "" : "Terms And Condition"}
+              {collapsed ? "" : "Terms And Conditions"}
             </Link>
           ),
         },
@@ -220,7 +220,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       style={{ width: collapsed ? 80 : 320 }}
     >
       {/* Toggle Button */}
-      <div
+      {/* <div
         className="flex justify-end items-center p-2 cursor-pointer"
         onClick={() => setCollapsed(!collapsed)}
       >
@@ -229,7 +229,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         ) : (
           <MenuFoldOutlined style={{ fontSize: 20 }} />
         )}
-      </div>
+      </div> */}
 
       {/* Logo + Upload */}
       {!collapsed && (
